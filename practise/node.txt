@@ -1,0 +1,216 @@
+/*新建循环链表	tem->next = head;
+新建单链表  	tem->next = NULL;
+查看链表是否为循环链表，快慢指针长度为多少？
+*/
+// ptr.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+//
+
+#include "pch.h"
+#include <iostream>
+#include<string>
+#include<memory>
+#include<thread>
+using namespace std;
+struct node {
+	int date;
+	node *next;
+};
+node *create(int begin,int end) {
+	node *s;
+	node *head = NULL;;
+	node *tem =NULL ;
+	for (size_t i = begin; i <= end; i++) {
+		s = new node();
+		s->date = i;
+		if (head == NULL) {
+			head = s;
+			tem = head;
+		}
+		else{
+			tem->next = s;
+			tem = s;
+		}
+	}
+	tem->next = head;
+	return head;
+}
+// ptr.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+//
+
+#include "pch.h"
+#include <iostream>
+#include<string>
+#include<memory>
+#include<thread>listnode
+#define ERROR -1
+#define OK 0
+using namespace std;
+typedef struct listnode {
+	int data;
+	listnode *next;
+}*link;
+typedef struct {
+	link head;
+	int len;
+}Sqlist;
+void initList(Sqlist &list) {
+	list.head = (link)malloc(sizeof(listnode));
+	list.len = 0;
+	list.head->next = NULL;
+}
+void printfList(Sqlist &list) {
+	link p = list.head->next;
+	while (p) {
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+void mergeList(Sqlist &la, Sqlist &lb, Sqlist &lc) {
+	link lista, listb, listc,tem;
+	lista = la.head->next;
+	listb = lb.head->next;
+	lc.head = la.head;//lc指向la的头部
+	la.head->next = NULL;//la释放
+	tem = lc.head;
+	while (lista && listb)
+	{
+		if (lista->data <= listb->data)
+		{
+			listc = lista->next;
+			lista->next = NULL;
+			//lista->next = lc.head->next;//lista只记录当前的节点信息
+			lc.head->next = lista;//lc获取该节点
+			lista = listc;//lista后移
+			lc.head = lc.head->next;
+		}
+		else
+		{
+			listc = listb->next;
+			listb->next = NULL;
+		//	listb->next = lc.head->next;
+			lc.head->next = listb;
+			listb = listc;
+			lc.head = lc.head->next;
+		}
+	}
+	while (lista)
+	{
+		listc = lista->next;
+		lista->next = lc.head->next;
+		lc.head->next = lista;
+		lista = listc;
+	}
+	while (listb)
+	{
+		listc = listb->next;
+		listb->next = lc.head->next;
+		lc.head->next = listb;
+		listb = listc;
+	}
+	lc.head = tem;
+	delete lb.head;
+}
+listnode *create(int begin,int end) {
+	listnode *s;
+	listnode *head = NULL;;
+	listnode *tem =NULL ;
+	for (size_t i = begin; i <= end; i+=2) {
+		s = new listnode();
+		s->data = i;
+		if (head == NULL) {
+			head = s;
+			tem = head;
+		}
+		else{
+			tem->next = s;
+			tem = s;
+		}
+	}
+	tem->next = NULL;
+	return head;
+}
+int ListInsert(Sqlist &list, int i, int num) {
+	link p, q;
+	int j = 0;
+	q = list.head;
+	while (q && j < i - 1)
+	{
+		q = q->next;
+		j++;
+	}
+	if (!q || j > i - 1)return ERROR;
+	p = (link)malloc(sizeof(listnode));
+	p->data = num;
+	p->next = q->next;
+	q->next = p;
+	list.len++;
+	return OK;
+}
+listnode* Linked_list(listnode *m, listnode *n) {
+	listnode* head = n;
+	while (n != NULL || m != NULL) {
+		if (n != NULL) {
+			if (m->data >= n->data) {
+				n = n->next;
+			}
+			else {
+				listnode *tem = m;
+				n->next = n;
+				n = m;
+				n = n->next;
+				m = m->next;
+			}
+		}
+		else {
+			n = m;
+			m = m->next;
+		}
+
+	}
+	return head;
+}
+
+
+int main()
+{   
+	int count = 1;
+	Sqlist list1, list2, list3;
+	initList(list1);
+	initList(list2);
+	for (int i = 1; i < 10; i+=2) {
+		ListInsert(list1, count, i);
+		ListInsert(list2, count, i+1);
+		count++;
+	}
+	mergeList(list1, list2, list3);
+	printf("la:");
+	printfList(list1);
+	//printf("lb:");
+	//printfList(list2);
+	printf("lc:");
+	printfList(list3);
+	return 0;
+}
+
+
+int main()
+{   
+
+	node *n = create(1,6);
+	node *slow = n;
+	node *fast = n;
+	int m = 0;
+	while (fast) {
+		fast = fast->next->next;
+		slow = slow->next;
+		m++;
+		if (fast == slow) {
+			cout << "链表有环,长度为m=" <<m<<endl;
+			break;
+		}
+	}
+
+	return 0;
+}
+
